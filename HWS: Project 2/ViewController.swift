@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     var countries = [String]()
     var score = 0
     var correctAnswer = 0
+    var questionsAsked = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +33,12 @@ class ViewController: UIViewController {
 
         askQuestion()
     }
+    
+    func resetQuestions(action: UIAlertAction! = nil) {
+        score = 0
+        questionsAsked = 0
+        title = "\(countries[correctAnswer].uppercased())            Score: \(score)"
+    }
 
     func askQuestion(action: UIAlertAction! = nil) {
         
@@ -42,26 +49,36 @@ class ViewController: UIViewController {
         button2.setImage(UIImage(named: countries[1]), for: .normal)
         button3.setImage(UIImage(named: countries[2]), for: .normal)
         
-        title = countries[correctAnswer].uppercased()
+        title = "\(countries[correctAnswer].uppercased())            Score: \(score)"
     }
 
     @IBAction func enterButtonTapped(_ sender: UIButton) {
         var title: String
-        
-        if sender.tag == correctAnswer {
-            title = "Correct"
-            score += 1
+        var message: String
+    
+        if questionsAsked < 9 {
+            if sender.tag == correctAnswer {
+                questionsAsked += 1
+                score = score + 1
+                title = "Correct"
+                message = "Great Job!"
+            } else {
+                questionsAsked += 1
+                score = score - 1
+                title = "Wrong"
+                message = "Thats the flag of \(countries[sender.tag].capitalized)"
+            }
+            
+            let ac = UIAlertController(title: title, message: message , preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Next Question", style: .default, handler: askQuestion))
+            present(ac, animated: true)
+            
         } else {
-            title = "Wrong"
-            score -= 1
+            let ac = UIAlertController(title: "End of the Quiz" , message: "Final Score: \(score)" , preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Reset Quiz", style: .default, handler: resetQuestions))
+            present(ac, animated: true)
         }
-        
-        let ac = UIAlertController(title: title, message: "Your score is \(score)", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Continue", style: .default, handler: askQuestion))
-        
-        present(ac, animated: true)
-        
-        
+    
     }
 }
 
